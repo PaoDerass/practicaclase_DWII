@@ -1,31 +1,23 @@
-import React, { ReactNode, useContext, useState } from 'react'
-import { ContextCarrito } from '../Contex/ContexCarrito'
-import { Producto } from '../Modelos/Producto'
+import { createContext, useContext, useState } from "react";
+import { Producto } from "@/app/Modelos/Producto";
 
+const CarritoContext = createContext<any>(null);
 
-interface Node{
-    children:ReactNode
-}
+export function CarritoProvider({ children }: { children: React.ReactNode }) {
+    const [productoCarrito, setProductoCarrito] = useState<Producto[]>([]);
+    const [totalPagar, setTotalPagar] = useState(0);
 
-export default function Provider({children}: Node) {
+    function agregarCarrito(producto: Producto) {
+        setProductoCarrito([...productoCarrito, producto]);
+    }
 
-  const [producto, setProducto] = useState<Producto[]> ([]);
-  const [productoCarrito, setProductoCarrito] = useState<Producto[]> ([]);
-  const [totalPagar,setTotalPagar]= useState(0)
-
-  const agregarCarrito= (item:Producto) =>{
-    setProductoCarrito([...productoCarrito,item])
-  }
-
-
-  return (
-    
-    <ContextCarrito.Provider value={{producto,setProducto,productoCarrito,setProductoCarrito,agregarCarrito,totalPagar,setTotalPagar}}>
+    return (
+        <CarritoContext.Provider value={{ productoCarrito, totalPagar, setTotalPagar, agregarCarrito }}>
             {children}
-    </ContextCarrito.Provider>
-  )
+        </CarritoContext.Provider>
+    );
 }
 
-export function useContextCarrito(){
-    return useContext(ContextCarrito)
+export function useContextCarrito() {
+    return useContext(CarritoContext);
 }

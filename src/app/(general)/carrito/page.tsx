@@ -1,50 +1,47 @@
 'use client'
-import CardList from '@/app/Components/CardList';
-import { useContextCarrito } from '@/app/Provider/Provider'
 import React, { useEffect } from 'react'
+import { useContextCarrito } from '@/app/Provider/Provider'
 
-export default function page() {
-
+export default function CarritoPage() {
     const { productoCarrito, totalPagar, setTotalPagar } = useContextCarrito();
 
-    function calcularTotalPagar() {
-        let total = 0;
-
-        for (let x of productoCarrito) {
-            let subTotal = x.precioProducto + (x.precioProducto * ( x.isvProducto/100));
-            total += subTotal
-        }
-        setTotalPagar(total)
-
-    }
-
     useEffect(() => {
-        calcularTotalPagar()
-    },[])
+        let total = productoCarrito.reduce((acc, item) => {
+            let isv = item.precioProducto * (item.isvProducto / 100);
+            return acc + (item.precioProducto + isv);
+        }, 0);
+        setTotalPagar(total);
+    }, [productoCarrito]);
 
-    function pagar(){
-        alert('El total a pagar es: '+ totalPagar)
+    function pagar() {
+        alert(`El total a pagar es: L. ${totalPagar.toFixed(2)}`);
     }
+
     return (
         <div className='container'>
-
-            <div className='items-center justify-items-center'>
-                <img src="https://static.vecteezy.com/system/resources/previews/014/807/338/non_2x/shopping-cart-line-icon-vector.jpg" alt="" style={{ height: '70px' }} />
-
-            </div>
+            <h2 className='text-center'>Carrito de Compras</h2>
             <div className="row">
-                {
-                    productoCarrito.map((item) => (
-                        <CardList {...item} ></CardList>
-                    ))
-                }
+                {productoCarrito.map((item) => (
+                    <div className="col-md-4 mb-3" key={item.IdProducto}>
+                        <div className="card">
+                            <img src={item.imagenProducto} className="card-img-top" alt={item.nombreProducto} style={{ height: '150px' }} />
+                            <div className="card-body">
+                                <h5 className="card-title">{item.nombreProducto}</h5>
+                                <p><strong>Precio:</strong> L. {item.precioProducto.toFixed(2)}</p>
+                                <p><strong>ISV ({item.isvProducto}%):</strong> L. {(item.precioProducto * (item.isvProducto / 100)).toFixed(2)}</p>
+                                <p><strong>Subtotal:</strong> L. {(item.precioProducto + (item.precioProducto * (item.isvProducto / 100))).toFixed(2)}</p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <br></br>
-            <div className="alert alert-light" role="alert">
-                Total a Pagar: {totalPagar}
+
+            <div className="alert alert-info text-center mt-3">
+                <h4>Total a Pagar: L. {totalPagar.toFixed(2)}</h4>
             </div>
-            <div className="alert alert-light" role="alert">
-                 <button className='btn btn-warning' onClick={pagar}>Pagar</button>
+
+            <div className="text-center mt-3">
+                <button className="btn btn-warning btn-lg" onClick={pagar}>Pagar</button>
             </div>
         </div>
     )
